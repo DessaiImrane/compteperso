@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import duplicate_icon %}
 {% block content %}
 <h1>Créanciers</h1>
 <form method="post" action="/creanciers">
@@ -50,7 +51,7 @@
       <td>{{ c.compte_destination.nom if c.compte_destination else "externe" }}</td>
       <td>{{ c.date_prochaine_echeance }}</td>
       <td>
-        <a href="/creanciers/{{ c.id }}/dupliquer">Dupliquer</a>
+        <a class="icon-link" href="/creanciers/{{ c.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a>
         {% if c.actif %}
         <form method="post" action="/creanciers/{{ c.id }}/desactiver" style="display:inline">
           <button type="submit">Désactiver</button>

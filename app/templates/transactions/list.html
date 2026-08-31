@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import duplicate_icon %}
 {% block content %}
 <h1>{{ compte.nom }} — transactions</h1>
 <p class="num">
@@ -35,7 +36,7 @@
           <input type="checkbox" onchange="this.form.submit()" {% if tx.pointe %}checked{% endif %}>
         </form>
       </td>
-      <td><a href="/transactions/{{ tx.id }}/dupliquer">Dupliquer</a></td>
+      <td><a class="icon-link" href="/transactions/{{ tx.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a></td>
     </tr>
   {% endfor %}
   </tbody>
