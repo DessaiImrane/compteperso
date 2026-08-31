@@ -5,12 +5,15 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 
-from app.db import SessionLocal
+from app.db import Base, SessionLocal, engine
 from app.services.creancier_engine import generate_due_echeances
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import app.models  # noqa: F401  ensure all tables are registered on Base.metadata
+
+    Base.metadata.create_all(engine)
     db = SessionLocal()
     try:
         generate_due_echeances(db, datetime.date.today())
