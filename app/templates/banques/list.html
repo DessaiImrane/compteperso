@@ -12,10 +12,10 @@
 <article>
   <header style="display:flex; justify-content:space-between; align-items:center;">
     <a href="/banques/{{ row.banque.id }}"><strong>{{ row.banque.nom }}</strong></a>
-    <span class="num">
-      Pointé <strong class="{{ 'amt-pos' if row.pointe >= 0 else 'amt-neg' }}">{{ row.pointe|money }}</strong>
-      &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if row.a_venir >= 0 else 'amt-neg' }}">{{ row.a_venir|money }}</strong>
-      &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if row.solde >= 0 else 'amt-neg' }}">{{ row.solde|money }}</strong>
+    <span class="stats-row">
+      <span class="stat">Pointé <strong class="{{ 'amt-pos' if row.pointe >= 0 else 'amt-neg' }}">{{ row.pointe|money }}</strong></span>
+      <span class="stat">À venir <strong class="{{ 'amt-pos' if row.a_venir >= 0 else 'amt-neg' }}">{{ row.a_venir|money }}</strong></span>
+      <span class="stat">Solde <strong class="{{ 'amt-pos' if row.solde >= 0 else 'amt-neg' }}">{{ row.solde|money }}</strong></span>
     </span>
   </header>
   <table class="fixed">

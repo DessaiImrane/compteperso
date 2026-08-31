@@ -2,10 +2,10 @@
 {% from "_icons.html" import duplicate_icon %}
 {% block content %}
 <h1>{{ compte.nom }} — transactions</h1>
-<p class="num">
-  Pointé <strong class="{{ 'amt-pos' if pointe >= 0 else 'amt-neg' }}">{{ pointe|money }}</strong>
-  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if a_venir >= 0 else 'amt-neg' }}">{{ a_venir|money }}</strong>
-  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if solde >= 0 else 'amt-neg' }}">{{ solde|money }}</strong>
+<p class="stats-row">
+  <span class="stat">Pointé <strong class="{{ 'amt-pos' if pointe >= 0 else 'amt-neg' }}">{{ pointe|money }}</strong></span>
+  <span class="stat">À venir <strong class="{{ 'amt-pos' if a_venir >= 0 else 'amt-neg' }}">{{ a_venir|money }}</strong></span>
+  <span class="stat">Solde <strong class="{{ 'amt-pos' if solde >= 0 else 'amt-neg' }}">{{ solde|money }}</strong></span>
 </p>
 <form method="post" action="{{ form_action }}">
   <fieldset role="group">

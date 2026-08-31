@@ -2,10 +2,10 @@
 {% from "_icons.html" import archive_icon %}
 {% block content %}
 <h1>{{ banque.nom }}</h1>
-<p class="num">
-  Pointé <strong class="{{ 'amt-pos' if total_pointe >= 0 else 'amt-neg' }}">{{ total_pointe|money }}</strong>
-  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if total_a_venir >= 0 else 'amt-neg' }}">{{ total_a_venir|money }}</strong>
-  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if total_solde >= 0 else 'amt-neg' }}">{{ total_solde|money }}</strong>
+<p class="stats-row">
+  <span class="stat">Pointé <strong class="{{ 'amt-pos' if total_pointe >= 0 else 'amt-neg' }}">{{ total_pointe|money }}</strong></span>
+  <span class="stat">À venir <strong class="{{ 'amt-pos' if total_a_venir >= 0 else 'amt-neg' }}">{{ total_a_venir|money }}</strong></span>
+  <span class="stat">Solde <strong class="{{ 'amt-pos' if total_solde >= 0 else 'amt-neg' }}">{{ total_solde|money }}</strong></span>
 </p>
 <form method="post" action="/banques/{{ banque.id }}/comptes">
   <fieldset role="group">
