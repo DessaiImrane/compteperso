@@ -102,3 +102,15 @@ class TagLearning(Base):
     tag_id: Mapped[int] = mapped_column(ForeignKey("tags.id"))
 
     tag: Mapped["Tag"] = relationship()
+
+
+class RapprochementSession(Base):
+    __tablename__ = "rapprochement_sessions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    banque_id: Mapped[int] = mapped_column(ForeignKey("banques.id"))
+    date: Mapped[datetime.date]
+    total_banque_pointe: Mapped[float]
+    total_banque_a_venir: Mapped[float]
+    total_pointe_calcule: Mapped[float]
+    ecart: Mapped[float]
