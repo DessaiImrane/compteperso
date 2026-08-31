@@ -25,7 +25,9 @@ def main() -> None:
     while not server.started:
         time.sleep(0.05)
 
-    webview.create_window("Comptes", f"http://127.0.0.1:{PORT}", width=1280, height=850)
+    webview.create_window(
+        "Comptes", f"http://127.0.0.1:{PORT}", width=1280, height=850, fullscreen=True
+    )
     webview.start()
 
     server.should_exit = True
