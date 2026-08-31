@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Banques</h1>
+<form method="post" action="/banques">
+  <input type="text" name="nom" placeholder="Nom de la banque" required>
+  <button type="submit">Ajouter</button>
+</form>
+<ul>
+  {% for banque in banques %}
+    <li><a href="/banques/{{ banque.id }}">{{ banque.nom }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

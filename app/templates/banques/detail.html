@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ banque.nom }}</h1>
+<p>Total pointé banque : {{ total_banque }}</p>
+<form method="post" action="/banques/{{ banque.id }}/comptes">
+  <input type="text" name="nom" placeholder="Nouveau compte virtuel" required>
+  <button type="submit">Ajouter</button>
+</form>
+<table>
+  <tr><th>Compte</th><th>Pointé</th><th>À venir</th><th></th></tr>
+  {% for compte, pointe, a_venir in comptes %}
+    <tr>
+      <td><a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a>{% if not compte.actif %} (archivé){% endif %}</td>
+      <td>{{ pointe }}</td>
+      <td>{{ a_venir }}</td>
+      <td>
+        {% if compte.actif %}
+        <form method="post" action="/comptes/{{ compte.id }}/archiver">
+          <button type="submit">Archiver</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
