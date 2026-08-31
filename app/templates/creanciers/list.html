@@ -59,12 +59,14 @@
         <td>{{ c.recurrence }}</td>
         <td>{{ c.date_prochaine_echeance or "—" }}</td>
         <td>
-          <a class="icon-link" href="/creanciers/{{ c.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a>
-          {% if c.actif %}
-          <form method="post" action="/creanciers/{{ c.id }}/desactiver" style="display:inline">
-            <button type="submit" class="icon-link" style="background:none; border:none; padding:0;" title="Désactiver">{{ disable_icon() }}</button>
-          </form>
-          {% endif %}
+          <div class="row-actions">
+            <a class="icon-link" href="/creanciers/{{ c.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a>
+            {% if c.actif %}
+            <form method="post" action="/creanciers/{{ c.id }}/desactiver">
+              <button type="submit" class="icon-btn" title="Désactiver">{{ disable_icon() }}</button>
+            </form>
+            {% endif %}
+          </div>
         </td>
       </tr>
     {% endfor %}

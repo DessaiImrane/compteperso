@@ -72,6 +72,12 @@
     tr.row-clickable:hover { background: var(--row-hover); }
     a.icon-link { display: inline-flex; align-items: center; color: #64748b; }
     a.icon-link:hover { color: var(--accent); }
+    .row-actions { display: flex; align-items: center; gap: 0.6rem; }
+    button.icon-btn {
+      background: none; border: none; padding: 0; margin: 0; box-shadow: none;
+      display: inline-flex; align-items: center; color: #64748b; cursor: pointer;
+    }
+    button.icon-btn:hover { color: var(--accent); background: none; }
     thead th { color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1px solid var(--sidebar-border); }
     tbody tr { border-bottom: 1px solid #f1f5f9; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }

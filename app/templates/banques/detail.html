@@ -28,7 +28,7 @@
         <td>
           {% if c.compte.actif %}
           <form method="post" action="/comptes/{{ c.compte.id }}/archiver">
-            <button type="submit" class="icon-link" style="background:none; border:none; padding:0;" title="Archiver">{{ archive_icon() }}</button>
+            <button type="submit" class="icon-btn" title="Archiver">{{ archive_icon() }}</button>
           </form>
           {% endif %}
         </td>
