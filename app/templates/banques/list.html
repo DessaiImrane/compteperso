@@ -7,20 +7,30 @@
     <button type="submit">Ajouter</button>
   </fieldset>
 </form>
-<div class="grid">
-  {% for banque, comptes, total_banque in rows %}
-    <article>
-      <header>
-        <a href="/banques/{{ banque.id }}">{{ banque.nom }}</a>
-        <small> — total pointé {{ total_banque }}</small>
-      </header>
-      <ul>
-        {% for compte, pointe, a_venir in comptes %}
-          <li><a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a> — pointé {{ pointe }}, à venir {{ a_venir }}</li>
-        {% endfor %}
-        {% if not comptes %}<li><em>Aucun compte virtuel — <a href="/banques/{{ banque.id }}">en ajouter un</a></em></li>{% endif %}
-      </ul>
-    </article>
-  {% endfor %}
-</div>
+
+{% for banque, comptes, total_banque in rows %}
+<article>
+  <header style="display:flex; justify-content:space-between; align-items:center;">
+    <a href="/banques/{{ banque.id }}"><strong>{{ banque.nom }}</strong></a>
+    <span class="num">Total pointé <strong class="{{ 'amt-pos' if total_banque >= 0 else 'amt-neg' }}">{{ total_banque }}</strong></span>
+  </header>
+  <table>
+    <thead>
+      <tr><th>Compte</th><th class="num">Pointé</th><th class="num">À venir</th></tr>
+    </thead>
+    <tbody>
+      {% for compte, pointe, a_venir in comptes %}
+        <tr>
+          <td><a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a></td>
+          <td class="num {{ 'amt-pos' if pointe >= 0 else 'amt-neg' }}">{{ pointe }}</td>
+          <td class="num {{ 'amt-pos' if a_venir >= 0 else 'amt-neg' }}">{{ a_venir }}</td>
+        </tr>
+      {% endfor %}
+      {% if not comptes %}
+        <tr><td colspan="3"><em>Aucun compte virtuel — <a href="/banques/{{ banque.id }}">en ajouter un</a></em></td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</article>
+{% endfor %}
 {% endblock %}

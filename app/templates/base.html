@@ -8,33 +8,85 @@
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
   <style>
-    .layout { display: flex; align-items: flex-start; }
-    .sidebar {
-      width: 260px; flex-shrink: 0; padding: 1rem; border-right: 1px solid var(--pico-muted-border-color);
-      min-height: 100vh; position: sticky; top: 0;
+    :root {
+      --pico-border-radius: 10px;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --pico-primary: var(--accent);
+      --pico-primary-background: var(--accent);
+      --pico-primary-hover-background: var(--accent-hover);
+      --pico-primary-border: var(--accent);
+      --pico-primary-hover-border: var(--accent-hover);
+      --sidebar-bg: #f8fafc;
+      --sidebar-border: #e2e8f0;
+      --row-hover: #eef2ff;
     }
-    .sidebar h2 { font-size: 0.9rem; text-transform: uppercase; color: var(--pico-muted-color); margin-bottom: 0.5rem; }
-    .sidebar ul { list-style: none; padding-left: 0; margin: 0 0 1rem 0; }
-    .sidebar .comptes { padding-left: 0.75rem; margin-bottom: 1rem; }
-    .sidebar .comptes li { cursor: grab; padding: 0.15rem 0; }
-    .sidebar nav ul { margin-bottom: 0; }
-    main.container { flex: 1; padding: 1.5rem 2rem; }
-    table { display: block; overflow-x: auto; white-space: nowrap; }
+    html, body { height: 100%; margin: 0; }
+    body { background: #f1f5f9; }
+
+    .app-shell { display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar {
+      width: 260px; flex-shrink: 0; background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border); overflow-y: auto;
+      height: 100vh; padding: 1.25rem 0.9rem; box-sizing: border-box;
+    }
+    .sidebar-title { font-weight: 700; font-size: 1.05rem; margin: 0 0.25rem 1.25rem; color: #0f172a; }
+    .bank-group { margin-bottom: 1.1rem; }
+    .bank-name {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+      color: #64748b; padding: 0.2rem 0.25rem; margin-bottom: 0.15rem; display: block; text-decoration: none;
+    }
+    .bank-name:hover { color: var(--accent); }
+    .compte-list { list-style: none; margin: 0; padding: 0; }
+    .compte-row {
+      display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.5rem;
+      border-radius: 8px; cursor: grab;
+    }
+    .compte-row:hover { background: var(--row-hover); }
+    .compte-row a { text-decoration: none; color: #1e293b; flex: 1; font-size: 0.92rem; }
+    .drag-handle { color: #cbd5e1; font-size: 0.85rem; }
+    .sidebar-nav { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--sidebar-border); }
+    .sidebar-nav ul { list-style: none; margin: 0; padding: 0; }
+    .sidebar-nav a {
+      display: block; padding: 0.4rem 0.5rem; border-radius: 8px; color: #334155;
+      text-decoration: none; font-size: 0.9rem;
+    }
+    .sidebar-nav a:hover { background: var(--row-hover); color: var(--accent); }
+
+    main.main-scroll { flex: 1; overflow-y: auto; height: 100vh; padding: 2rem 2.5rem; box-sizing: border-box; }
+    main.main-scroll > :first-child { margin-top: 0; }
+
+    table { border-collapse: collapse; overflow-x: auto; display: block; white-space: nowrap; }
+    th, td { text-align: left; padding: 0.55rem 0.85rem; }
+    thead th { color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1px solid var(--sidebar-border); }
+    tbody tr { border-bottom: 1px solid #f1f5f9; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .amt-pos { color: #16a34a; }
+    .amt-neg { color: #dc2626; }
+
+    article { border-radius: var(--pico-border-radius); box-shadow: 0 1px 3px rgba(15, 23, 42, .08); margin-bottom: 1.25rem; }
+    button, input[type="submit"], [role="button"] { border-radius: 8px; }
   </style>
 </head>
 <body>
-  <div class="layout">
+  <div class="app-shell">
     <aside class="sidebar">
-      <strong>Comptes</strong>
+      <div class="sidebar-title">Comptes</div>
       {% for entry in sidebar_banques %}
-        <h2><a href="/banques/{{ entry.banque.id }}">{{ entry.banque.nom }}</a></h2>
-        <ul class="comptes" data-banque-id="{{ entry.banque.id }}">
-          {% for compte in entry.comptes %}
-            <li data-id="{{ compte.id }}">⠿ <a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a></li>
-          {% endfor %}
-        </ul>
+        <div class="bank-group">
+          <a class="bank-name" href="/banques/{{ entry.banque.id }}">{{ entry.banque.nom }}</a>
+          <ul class="compte-list" data-banque-id="{{ entry.banque.id }}">
+            {% for compte in entry.comptes %}
+              <li class="compte-row" data-id="{{ compte.id }}">
+                <span class="drag-handle">⠿</span>
+                <a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
       {% endfor %}
-      <nav>
+      <nav class="sidebar-nav">
         <ul>
           <li><a href="/rapprochement">Rapprochement</a></li>
           <li><a href="/creanciers">Créanciers</a></li>
@@ -44,14 +96,15 @@
         </ul>
       </nav>
     </aside>
-    <main class="container">
+    <main class="main-scroll">
       {% block content %}{% endblock %}
     </main>
   </div>
   <script>
-    document.querySelectorAll('.sidebar .comptes').forEach(function (list) {
+    document.querySelectorAll('.compte-list').forEach(function (list) {
       new Sortable(list, {
         animation: 150,
+        handle: '.drag-handle',
         onEnd: function () {
           const ids = Array.from(list.children).map(function (li) { return parseInt(li.dataset.id, 10); });
           fetch('/banques/' + list.dataset.banqueId + '/comptes/ordre', {
