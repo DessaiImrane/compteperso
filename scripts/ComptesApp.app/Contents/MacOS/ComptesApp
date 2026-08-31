@@ -1,0 +1,4 @@
+#!/bin/bash
+cd "/Users/imrane.dessai/git/compte"
+source .venv/bin/activate
+exec python3 launcher.py
