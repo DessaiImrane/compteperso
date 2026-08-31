@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% from "_icons.html" import duplicate_icon %}
+{% from "_icons.html" import duplicate_icon, disable_icon %}
 {% block content %}
 <h1>Créanciers</h1>
 <p><small>Destination externe (vide) : le signe du montant fait foi — négatif = sort du compte, positif = rentre (ex: CAF). Destination interne : la direction est fixée par source→destination, le signe importe peu.</small></p>
-<form method="post" action="/creanciers">
+<form method="post" action="{{ form_action }}">
   <fieldset role="group">
     <input type="text" name="nom" placeholder="Nom" value="{{ prefill.nom if prefill else '' }}" required>
     <input type="number" step="0.01" name="montant_defaut" placeholder="Montant" value="{{ prefill.montant_defaut if prefill else '' }}" required>
@@ -11,55 +11,71 @@
   <fieldset role="group">
     <select name="compte_source_id" required aria-label="Compte source">
       {% for compte in comptes %}
-        <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
+        <option value="{{ compte.id }}" {% if prefill and prefill.compte_source_id == compte.id %}selected{% endif %}>{{ compte.banque.nom }} / {{ compte.nom }}</option>
       {% endfor %}
     </select>
     <select name="compte_destination_id" aria-label="Compte destination">
-      <option value="">— externe —</option>
+      <option value="" {% if not prefill or not prefill.compte_destination_id %}selected{% endif %}>— externe —</option>
       {% for compte in comptes %}
-        <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
+        <option value="{{ compte.id }}" {% if prefill and prefill.compte_destination_id == compte.id %}selected{% endif %}>{{ compte.banque.nom }} / {{ compte.nom }}</option>
       {% endfor %}
     </select>
   </fieldset>
   <fieldset role="group">
-    <input type="date" name="date_prochaine_echeance" required>
-    <select name="recurrence">
-      <option value="mensuelle">Mensuelle</option>
-      <option value="hebdomadaire">Hebdomadaire</option>
-      <option value="custom">Custom</option>
-      <option value="aucune">Aucune (ponctuelle)</option>
+    <input type="date" name="date_prochaine_echeance" value="{{ prefill.date_prochaine_echeance if prefill else '' }}" required>
+    <select name="recurrence" aria-label="Récurrence">
+      <option value="mensuelle" {% if prefill and prefill.recurrence == "mensuelle" %}selected{% endif %}>Mensuelle</option>
+      <option value="hebdomadaire" {% if prefill and prefill.recurrence == "hebdomadaire" %}selected{% endif %}>Hebdomadaire</option>
+      <option value="custom" {% if prefill and prefill.recurrence == "custom" %}selected{% endif %}>Custom</option>
+      <option value="aucune" {% if prefill and prefill.recurrence == "aucune" %}selected{% endif %}>Aucune (ponctuelle)</option>
     </select>
-    <input type="number" name="intervalle_jours" placeholder="jours (si custom)">
+    <input type="number" name="intervalle_jours" placeholder="jours (si custom)" value="{{ prefill.intervalle_jours if prefill else '' }}">
   </fieldset>
   <fieldset role="group">
-    <select name="fin_type">
-      <option value="jamais">Jamais</option>
-      <option value="date">Date de fin</option>
-      <option value="occurrences">Nombre d'occurrences</option>
+    <select name="fin_type" aria-label="Fin">
+      <option value="jamais" {% if not prefill or prefill.fin_type == "jamais" %}selected{% endif %}>Jamais</option>
+      <option value="date" {% if prefill and prefill.fin_type == "date" %}selected{% endif %}>Date de fin</option>
+      <option value="occurrences" {% if prefill and prefill.fin_type == "occurrences" %}selected{% endif %}>Nombre d'occurrences</option>
     </select>
-    <input type="date" name="fin_date">
-    <input type="number" name="fin_occurrences" placeholder="Nombre d'occurrences">
-    <button type="submit">Enregistrer</button>
+    <input type="date" name="fin_date" value="{{ prefill.fin_date if prefill else '' }}">
+    <input type="number" name="fin_occurrences" placeholder="Nombre d'occurrences" value="{{ prefill.fin_occurrences if prefill else '' }}">
+    <button type="submit">{{ "Enregistrer" if prefill and "/modifier" in form_action else "Ajouter" }}</button>
   </fieldset>
 </form>
-<table>
-  <tr><th>Nom</th><th>Montant</th><th>Source</th><th>Destination</th><th>Prochaine échéance</th><th></th></tr>
-  {% for c in creanciers %}
-    <tr>
-      <td>{{ c.nom }}{% if not c.actif %} (inactif){% endif %}</td>
-      <td>{{ c.montant_defaut }}</td>
-      <td>{{ c.compte_source.nom }}</td>
-      <td>{{ c.compte_destination.nom if c.compte_destination else "externe" }}</td>
-      <td>{{ c.date_prochaine_echeance }}</td>
-      <td>
-        <a class="icon-link" href="/creanciers/{{ c.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a>
-        {% if c.actif %}
-        <form method="post" action="/creanciers/{{ c.id }}/desactiver" style="display:inline">
-          <button type="submit">Désactiver</button>
-        </form>
-        {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
+<table class="fixed">
+  <colgroup>
+    <col style="width:20%"><col style="width:10%"><col style="width:28%">
+    <col style="width:12%"><col style="width:14%"><col style="width:16%">
+  </colgroup>
+  <thead>
+    <tr><th>Nom</th><th class="num">Montant</th><th>Trajet</th><th>Récurrence</th><th>Prochaine échéance</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for c in creanciers %}
+      <tr class="row-clickable" data-href="/creanciers/{{ c.id }}/modifier">
+        <td>{{ c.nom }}{% if not c.actif %} <small>(inactif)</small>{% endif %}</td>
+        <td class="num {{ 'amt-pos' if c.montant_defaut >= 0 else 'amt-neg' }}">{{ c.montant_defaut }}</td>
+        <td>{{ c.compte_source.nom }} → {{ c.compte_destination.nom if c.compte_destination else "externe" }}</td>
+        <td>{{ c.recurrence }}</td>
+        <td>{{ c.date_prochaine_echeance or "—" }}</td>
+        <td>
+          <a class="icon-link" href="/creanciers/{{ c.id }}/dupliquer" title="Dupliquer">{{ duplicate_icon() }}</a>
+          {% if c.actif %}
+          <form method="post" action="/creanciers/{{ c.id }}/desactiver" style="display:inline">
+            <button type="submit" class="icon-link" style="background:none; border:none; padding:0;" title="Désactiver">{{ disable_icon() }}</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
+<script>
+  document.querySelectorAll('tr.row-clickable').forEach(function (tr) {
+    tr.addEventListener('click', function (e) {
+      if (e.target.closest('a, button, input, form')) return;
+      window.location = tr.dataset.href;
+    });
+  });
+</script>
 {% endblock %}

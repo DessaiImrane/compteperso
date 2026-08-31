@@ -47,6 +47,41 @@ def test_duplicate_creancier_prefills_form(client):
     assert "Abonnement" in resp.text
 
 
+def test_edit_creancier_form_prefills_and_updates(client):
+    compte = _compte(client)
+    client.post(
+        "/creanciers",
+        data={
+            "nom": "Avant", "montant_defaut": "10", "compte_source_id": str(compte.id),
+            "compte_destination_id": "", "date_prochaine_echeance": "2026-09-01",
+            "recurrence": "mensuelle", "fin_type": "jamais",
+        },
+    )
+    from app.db import get_db
+    from app.main import app
+    db = next(app.dependency_overrides[get_db]())
+    from app.models import Creancier
+    creancier = db.query(Creancier).filter_by(nom="Avant").first()
+
+    resp = client.get(f"/creanciers/{creancier.id}/modifier")
+    assert resp.status_code == 200
+    assert "Avant" in resp.text
+
+    resp = client.post(
+        f"/creanciers/{creancier.id}/modifier",
+        data={
+            "nom": "Après", "montant_defaut": "20", "compte_source_id": str(compte.id),
+            "compte_destination_id": "", "date_prochaine_echeance": "2026-10-01",
+            "recurrence": "mensuelle", "fin_type": "jamais",
+        },
+    )
+    assert resp.status_code in (200, 303)
+
+    db.refresh(creancier)
+    assert creancier.nom == "Après"
+    assert creancier.montant_defaut == 20.0
+
+
 def test_desactiver_creancier(client):
     compte = _compte(client)
     client.post(
