@@ -11,6 +11,14 @@ def parse_montant_fr(s: str) -> float:
     return float(cleaned)
 
 
+def split_preview_rows(text: str, separateur: str) -> list[list[str]]:
+    return [
+        [col.strip() for col in line.split(separateur)]
+        for line in text.strip().splitlines()
+        if line.strip()
+    ]
+
+
 def parse_pasted_text(text: str, mapping) -> list[dict]:
     rows = []
     for line in text.strip().splitlines():

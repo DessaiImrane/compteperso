@@ -11,6 +11,19 @@ def _banque_et_compte(client, nom="Bourso"):
     return banque, compte
 
 
+def _calibrer(client, banque_id, texte="05/08/2026\tRestaurant\t-45,90"):
+    client.post(
+        f"/rapprochement/{banque_id}/mapping/valider",
+        data={
+            "texte": texte,
+            "separateur": "tab",
+            "role__0": "date",
+            "role__1": "libelle",
+            "role__2": "montant",
+        },
+    )
+
+
 def test_coller_sans_mapping_demande_calibrage(client):
     banque, _ = _banque_et_compte(client)
     resp = client.post(f"/rapprochement/{banque.id}/coller", data={"texte": "05/08/2026\tTest\t-10,00"})
@@ -18,12 +31,37 @@ def test_coller_sans_mapping_demande_calibrage(client):
     assert "calibrage" in resp.text.lower() or "mapping" in resp.text.lower()
 
 
-def test_mapping_puis_coller_affiche_staging(client):
-    banque, compte = _banque_et_compte(client)
-    client.post(
-        f"/rapprochement/{banque.id}/mapping",
-        data={"colonne_date": "0", "colonne_libelle": "1", "colonne_montant": "2", "separateur": "tab"},
+def test_mapping_apercu_affiche_un_select_par_colonne(client):
+    banque, _ = _banque_et_compte(client)
+    resp = client.post(
+        f"/rapprochement/{banque.id}/mapping/apercu",
+        data={"texte": "05/08/2026\tRestaurant\t-45,90", "separateur": "tab"},
     )
+    assert resp.status_code == 200
+    assert resp.text.count('name="role__') == 3
+    assert "Ne pas utiliser" in resp.text
+    assert "Restaurant" in resp.text  # ligne d'exemple visible dans l'aperçu
+
+
+def test_mapping_valider_sans_toutes_les_colonnes_redemande(client):
+    banque, _ = _banque_et_compte(client)
+    resp = client.post(
+        f"/rapprochement/{banque.id}/mapping/valider",
+        data={
+            "texte": "05/08/2026\tRestaurant\t-45,90",
+            "separateur": "tab",
+            "role__0": "date",
+            "role__1": "ignore",
+            "role__2": "ignore",
+        },
+    )
+    assert resp.status_code == 200
+    assert "Date, Libellé et Montant" in resp.text
+
+
+def test_mapping_valider_puis_coller_affiche_staging(client):
+    banque, compte = _banque_et_compte(client)
+    _calibrer(client, banque.id)
     resp = client.post(
         f"/rapprochement/{banque.id}/coller",
         data={"texte": "05/08/2026\tRestaurant\t-45,90"},
@@ -35,10 +73,7 @@ def test_mapping_puis_coller_affiche_staging(client):
 
 def test_valider_ecrit_transactions_non_verrouillees(client):
     banque, compte = _banque_et_compte(client)
-    client.post(
-        f"/rapprochement/{banque.id}/mapping",
-        data={"colonne_date": "0", "colonne_libelle": "1", "colonne_montant": "2", "separateur": "tab"},
-    )
+    _calibrer(client, banque.id)
     resp = client.post(
         f"/rapprochement/{banque.id}/valider",
         data={
@@ -66,10 +101,7 @@ def test_valider_ecrit_transactions_non_verrouillees(client):
 
 def test_valider_ignore_lignes_verrouillees(client):
     banque, compte = _banque_et_compte(client)
-    client.post(
-        f"/rapprochement/{banque.id}/mapping",
-        data={"colonne_date": "0", "colonne_libelle": "1", "colonne_montant": "2", "separateur": "tab"},
-    )
+    _calibrer(client, banque.id)
     resp = client.post(
         f"/rapprochement/{banque.id}/valider",
         data={

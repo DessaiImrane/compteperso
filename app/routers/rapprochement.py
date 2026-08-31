@@ -8,13 +8,14 @@ from app.db import get_db
 from app.main import templates
 from app.models import Banque, CompteVirtuel, MappingParsing, RapprochementSession, Tag, Transaction
 from app.services.dedup import is_duplicate
-from app.services.parsing import parse_pasted_text
+from app.services.parsing import parse_pasted_text, split_preview_rows
 from app.services.tag_learning import record_learning, suggest_tags
 from app.services.totals import calcule_ecart, total_pointe_banque
 
 router = APIRouter()
 
 _SEPARATEURS = {"tab": "\t", ";": ";", ",": ","}
+_ROLES = {"date": "colonne_date", "libelle": "colonne_libelle", "montant": "colonne_montant"}
 
 
 @router.get("/rapprochement")
@@ -31,22 +32,66 @@ def rapprochement_home(request: Request, banque_id: int | None = None, db: Sessi
     )
 
 
-@router.post("/rapprochement/{banque_id}/mapping")
-def save_mapping(
+@router.post("/rapprochement/{banque_id}/mapping/apercu")
+def mapping_apercu(
     banque_id: int,
-    colonne_date: int = Form(...),
-    colonne_libelle: int = Form(...),
-    colonne_montant: int = Form(...),
+    request: Request,
+    texte: str = Form(...),
     separateur: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    mapping = MappingParsing(
-        banque_id=banque_id,
-        colonne_date=colonne_date,
-        colonne_libelle=colonne_libelle,
-        colonne_montant=colonne_montant,
-        separateur=_SEPARATEURS[separateur],
+    banque = db.get(Banque, banque_id)
+    rows = split_preview_rows(texte, _SEPARATEURS[separateur])
+    col_count = max((len(r) for r in rows), default=0)
+    return templates.TemplateResponse(
+        request,
+        "rapprochement/mapping_apercu.html",
+        {
+            "banque": banque,
+            "texte": texte,
+            "separateur": separateur,
+            "rows": rows[:5],
+            "columns": range(col_count),
+            "selected_roles": {},
+            "erreur": None,
+        },
     )
+
+
+@router.post("/rapprochement/{banque_id}/mapping/valider")
+async def mapping_valider(banque_id: int, request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    texte = form["texte"]
+    separateur = form["separateur"]
+    sep = _SEPARATEURS[separateur]
+    rows = split_preview_rows(texte, sep)
+    col_count = max((len(r) for r in rows), default=0)
+
+    colonnes = {}
+    selected_roles = {}
+    for i in range(col_count):
+        role = form.get(f"role__{i}", "ignore")
+        selected_roles[i] = role
+        if role in _ROLES:
+            colonnes[_ROLES[role]] = i
+
+    if not all(key in colonnes for key in _ROLES.values()):
+        banque = db.get(Banque, banque_id)
+        return templates.TemplateResponse(
+            request,
+            "rapprochement/mapping_apercu.html",
+            {
+                "banque": banque,
+                "texte": texte,
+                "separateur": separateur,
+                "rows": rows[:5],
+                "columns": range(col_count),
+                "selected_roles": selected_roles,
+                "erreur": "Choisis une colonne pour Date, Libellé et Montant.",
+            },
+        )
+
+    mapping = MappingParsing(banque_id=banque_id, separateur=sep, **colonnes)
     db.add(mapping)
     db.commit()
     return RedirectResponse(f"/rapprochement?banque_id={banque_id}", status_code=303)

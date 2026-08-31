@@ -1,6 +1,11 @@
 import datetime
 import pytest
-from app.services.parsing import parse_date_fr, parse_montant_fr, parse_pasted_text
+from app.services.parsing import (
+    parse_date_fr,
+    parse_montant_fr,
+    parse_pasted_text,
+    split_preview_rows,
+)
 
 
 class FakeMapping:
@@ -38,3 +43,18 @@ def test_parse_pasted_text_skips_blank_and_short_lines():
     mapping = FakeMapping()
     rows = parse_pasted_text(text, mapping)
     assert len(rows) == 1
+
+
+def test_split_preview_rows_splits_and_strips_columns():
+    text = "05/08/2026\tRestaurant \t-45,90\n06/08/2026\tSalaire\t1 500,00"
+    rows = split_preview_rows(text, "\t")
+    assert rows == [
+        ["05/08/2026", "Restaurant", "-45,90"],
+        ["06/08/2026", "Salaire", "1 500,00"],
+    ]
+
+
+def test_split_preview_rows_skips_blank_lines():
+    text = "a\tb\n\nc\td"
+    rows = split_preview_rows(text, "\t")
+    assert len(rows) == 2

@@ -10,20 +10,17 @@
 
 {% if not mapping %}
 <h3>Calibrage (1re utilisation pour cette banque)</h3>
-<form method="post" action="/rapprochement/{{ banque.id }}/mapping">
-  <fieldset role="group">
-    <label>Colonne date (index depuis 0)<input type="number" name="colonne_date" required></label>
-    <label>Colonne libellé<input type="number" name="colonne_libelle" required></label>
-    <label>Colonne montant<input type="number" name="colonne_montant" required></label>
-    <label>Séparateur
-      <select name="separateur">
-        <option value="tab">Tabulation</option>
-        <option value=";">Point-virgule</option>
-        <option value=",">Virgule</option>
-      </select>
-    </label>
-  </fieldset>
-  <button type="submit">Enregistrer le calibrage</button>
+<p>Colle quelques lignes d'exemple copiées depuis le site de la banque.</p>
+<form method="post" action="/rapprochement/{{ banque.id }}/mapping/apercu">
+  <textarea name="texte" rows="6" cols="80" placeholder="Colle ici plusieurs lignes d'exemple" required></textarea>
+  <label>Séparateur
+    <select name="separateur">
+      <option value="tab">Tabulation</option>
+      <option value=";">Point-virgule</option>
+      <option value=",">Virgule</option>
+    </select>
+  </label>
+  <button type="submit">Aperçu</button>
 </form>
 {% else %}
 <form method="post" action="/rapprochement/{{ banque.id }}/coller">

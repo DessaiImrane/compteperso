@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ banque.nom }} — calibrage</h1>
+{% if erreur %}<p><mark>{{ erreur }}</mark></p>{% endif %}
+<form method="post" action="/rapprochement/{{ banque.id }}/mapping/valider">
+  <textarea name="texte" hidden>{{ texte }}</textarea>
+  <input type="hidden" name="separateur" value="{{ separateur }}">
+  <table>
+    <tr>
+      {% for i in columns %}
+        <th>
+          <select name="role__{{ i }}">
+            <option value="ignore" {% if selected_roles.get(i, "ignore") == "ignore" %}selected{% endif %}>Ne pas utiliser</option>
+            <option value="date" {% if selected_roles.get(i) == "date" %}selected{% endif %}>Date</option>
+            <option value="libelle" {% if selected_roles.get(i) == "libelle" %}selected{% endif %}>Libellé</option>
+            <option value="montant" {% if selected_roles.get(i) == "montant" %}selected{% endif %}>Montant</option>
+          </select>
+        </th>
+      {% endfor %}
+    </tr>
+    {% for row in rows %}
+      <tr>
+        {% for i in columns %}<td>{{ row[i] if i < row|length else "" }}</td>{% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+  <button type="submit">Valider le calibrage</button>
+</form>
+{% endblock %}
