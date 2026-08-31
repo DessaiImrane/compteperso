@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Rapport mensuel</h1>
+<form method="get" action="/reporting/mensuel">
+  <select name="compte_virtuel_id">
+    {% for compte in comptes %}
+      <option value="{{ compte.id }}" {% if compte.id == compte_virtuel_id %}selected{% endif %}>{{ compte.nom }}</option>
+    {% endfor %}
+  </select>
+  <input type="number" name="annee" value="{{ annee }}">
+  <input type="number" name="mois" value="{{ mois }}">
+  <button type="submit">Afficher</button>
+</form>
+{% if rapport %}
+<ul>
+  <li>Récurrent prévu : {{ rapport.recurrent_prevu }}</li>
+  <li>Récurrent pointé : {{ rapport.recurrent_pointe }}</li>
+  <li>Récurrent reste à passer : {{ (rapport.recurrent_prevu - rapport.recurrent_pointe) | round(2) }}</li>
+  <li>Non récurrent pointé : {{ rapport.non_recurrent_pointe }}</li>
+</ul>
+{% endif %}
+{% endblock %}
