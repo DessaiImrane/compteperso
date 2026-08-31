@@ -62,7 +62,13 @@
     main.main-scroll > :first-child { margin-top: 0; }
 
     table { border-collapse: collapse; overflow-x: auto; display: block; white-space: nowrap; }
+    table.fixed {
+      display: table; table-layout: fixed; width: 100%; white-space: normal;
+    }
+    table.fixed td, table.fixed th { overflow: hidden; text-overflow: ellipsis; }
     th, td { text-align: left; padding: 0.55rem 0.85rem; }
+    tr.row-clickable { cursor: pointer; }
+    tr.row-clickable:hover { background: var(--row-hover); }
     thead th { color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1px solid var(--sidebar-border); }
     tbody tr { border-bottom: 1px solid #f1f5f9; }
     .num { text-align: right; font-variant-numeric: tabular-nums; }

@@ -1,6 +1,12 @@
 import datetime as dt
 from app.models import Banque, CompteVirtuel, Transaction
-from app.services.totals import total_pointe, total_a_venir, total_pointe_banque, calcule_ecart
+from app.services.totals import (
+    total_pointe,
+    total_a_venir,
+    total_pointe_banque,
+    total_a_venir_banque,
+    calcule_ecart,
+)
 
 
 def _setup(db_session):
@@ -33,6 +39,11 @@ def test_total_a_venir_sums_only_unpointed(db_session):
 def test_total_pointe_banque_sums_across_comptes(db_session):
     banque, _, _ = _setup(db_session)
     assert total_pointe_banque(db_session, banque.id) == 70.0  # 100 + (-30)
+
+
+def test_total_a_venir_banque_sums_across_comptes(db_session):
+    banque, _, _ = _setup(db_session)
+    assert total_a_venir_banque(db_session, banque.id) == -20.0
 
 
 def test_calcule_ecart_rounds_to_cents():

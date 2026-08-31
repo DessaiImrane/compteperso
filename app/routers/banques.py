@@ -5,9 +5,20 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.main import templates
 from app.models import Banque, CompteVirtuel
-from app.services.totals import total_a_venir, total_pointe, total_pointe_banque
+from app.services.totals import (
+    total_a_venir,
+    total_a_venir_banque,
+    total_pointe,
+    total_pointe_banque,
+)
 
 router = APIRouter()
+
+
+def _compte_totaux(db, compte):
+    pointe = total_pointe(db, compte.id)
+    a_venir = total_a_venir(db, compte.id)
+    return {"compte": compte, "pointe": pointe, "a_venir": a_venir, "solde": round(pointe + a_venir, 2)}
 
 
 @router.get("/banques")
@@ -21,8 +32,18 @@ def list_banques(request: Request, db: Session = Depends(get_db)):
             .order_by(CompteVirtuel.ordre)
             .all()
         )
-        comptes_totaux = [(c, total_pointe(db, c.id), total_a_venir(db, c.id)) for c in comptes]
-        rows.append((banque, comptes_totaux, total_pointe_banque(db, banque.id)))
+        comptes_totaux = [_compte_totaux(db, c) for c in comptes]
+        pointe = total_pointe_banque(db, banque.id)
+        a_venir = total_a_venir_banque(db, banque.id)
+        rows.append(
+            {
+                "banque": banque,
+                "comptes": comptes_totaux,
+                "pointe": pointe,
+                "a_venir": a_venir,
+                "solde": round(pointe + a_venir, 2),
+            }
+        )
     return templates.TemplateResponse(request, "banques/list.html", {"rows": rows})
 
 
@@ -39,14 +60,18 @@ def banque_detail(banque_id: int, request: Request, db: Session = Depends(get_db
     comptes = (
         db.query(CompteVirtuel).filter_by(banque_id=banque_id).order_by(CompteVirtuel.ordre).all()
     )
-    rows = [(c, total_pointe(db, c.id), total_a_venir(db, c.id)) for c in comptes]
+    rows = [_compte_totaux(db, c) for c in comptes]
+    pointe = total_pointe_banque(db, banque_id)
+    a_venir = total_a_venir_banque(db, banque_id)
     return templates.TemplateResponse(
         request,
         "banques/detail.html",
         {
             "banque": banque,
             "comptes": rows,
-            "total_banque": total_pointe_banque(db, banque_id),
+            "total_pointe": pointe,
+            "total_a_venir": a_venir,
+            "total_solde": round(pointe + a_venir, 2),
         },
     )
 

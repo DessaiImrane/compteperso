@@ -1,26 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>{{ banque.nom }}</h1>
-<p>Total pointé banque : {{ total_banque }}</p>
+<p class="num">
+  Pointé <strong class="{{ 'amt-pos' if total_pointe >= 0 else 'amt-neg' }}">{{ total_pointe }}</strong>
+  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if total_a_venir >= 0 else 'amt-neg' }}">{{ total_a_venir }}</strong>
+  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if total_solde >= 0 else 'amt-neg' }}">{{ total_solde }}</strong>
+</p>
 <form method="post" action="/banques/{{ banque.id }}/comptes">
-  <input type="text" name="nom" placeholder="Nouveau compte virtuel" required>
-  <button type="submit">Ajouter</button>
+  <fieldset role="group">
+    <input type="text" name="nom" placeholder="Nouveau compte virtuel" required>
+    <button type="submit">Ajouter</button>
+  </fieldset>
 </form>
-<table>
-  <tr><th>Compte</th><th>Pointé</th><th>À venir</th><th></th></tr>
-  {% for compte, pointe, a_venir in comptes %}
-    <tr>
-      <td><a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a>{% if not compte.actif %} (archivé){% endif %}</td>
-      <td>{{ pointe }}</td>
-      <td>{{ a_venir }}</td>
-      <td>
-        {% if compte.actif %}
-        <form method="post" action="/comptes/{{ compte.id }}/archiver">
-          <button type="submit">Archiver</button>
-        </form>
-        {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
+<table class="fixed">
+  <colgroup><col style="width:40%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:12%"></colgroup>
+  <thead>
+    <tr><th>Compte</th><th class="num">Pointé</th><th class="num">À venir</th><th class="num">Solde</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for c in comptes %}
+      <tr>
+        <td><a href="/comptes/{{ c.compte.id }}/transactions">{{ c.compte.nom }}</a>{% if not c.compte.actif %} (archivé){% endif %}</td>
+        <td class="num {{ 'amt-pos' if c.pointe >= 0 else 'amt-neg' }}">{{ c.pointe }}</td>
+        <td class="num {{ 'amt-pos' if c.a_venir >= 0 else 'amt-neg' }}">{{ c.a_venir }}</td>
+        <td class="num {{ 'amt-pos' if c.solde >= 0 else 'amt-neg' }}">{{ c.solde }}</td>
+        <td>
+          {% if c.compte.actif %}
+          <form method="post" action="/comptes/{{ c.compte.id }}/archiver">
+            <button type="submit">Archiver</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}
