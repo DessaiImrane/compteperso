@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.db import Base, SessionLocal, engine, get_db
+from app.db import Base, SessionLocal, ensure_columns, engine, get_db
 from app.models import Banque, CompteVirtuel
 from app.services.creancier_engine import generate_due_echeances
 
@@ -14,6 +14,7 @@ from app.services.creancier_engine import generate_due_echeances
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
+    ensure_columns(engine, Base.metadata)
     db = SessionLocal()
     try:
         generate_due_echeances(db, datetime.date.today())
