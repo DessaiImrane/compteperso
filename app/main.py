@@ -28,8 +28,9 @@ def health():
     return {"status": "ok"}
 
 
-from app.routers import banques, creanciers, transactions  # noqa: E402
+from app.routers import banques, creanciers, rapprochement, transactions  # noqa: E402
 
 app.include_router(banques.router)
 app.include_router(transactions.router)
 app.include_router(creanciers.router)
+app.include_router(rapprochement.router)

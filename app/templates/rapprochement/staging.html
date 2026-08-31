@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ banque.nom }} — contrôle avant écriture</h1>
+<form method="post" action="/rapprochement/{{ banque.id }}/valider">
+  <input type="hidden" name="row_count" value="{{ rows|length }}">
+  <table>
+    <tr><th>Verrouillé (doublon)</th><th>Date</th><th>Libellé</th><th>Montant</th><th>Compte</th><th>Tags</th></tr>
+    {% for row in rows %}
+    <tr>
+      <td><input type="checkbox" name="verrouille__{{ loop.index0 }}" {% if row.doublon %}checked{% endif %}></td>
+      <td><input type="date" name="date__{{ loop.index0 }}" value="{{ row.date }}"></td>
+      <td><input type="text" name="libelle__{{ loop.index0 }}" value="{{ row.libelle }}"></td>
+      <td><input type="number" step="0.01" name="montant__{{ loop.index0 }}" value="{{ row.montant }}"></td>
+      <td>
+        <select name="compte_virtuel_id__{{ loop.index0 }}">
+          {% for compte in comptes %}
+            <option value="{{ compte.id }}">{{ compte.nom }}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td><input type="text" name="tags__{{ loop.index0 }}" value="{{ row.tags_suggeres }}"></td>
+    </tr>
+    {% endfor %}
+  </table>
+  <label>Total pointé affiché par la banque <input type="number" step="0.01" name="total_banque_pointe" required></label>
+  <label>Total à venir affiché par la banque <input type="number" step="0.01" name="total_banque_a_venir" required></label>
+  <button type="submit">Valider</button>
+</form>
+{% endblock %}
