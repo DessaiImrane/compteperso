@@ -2,35 +2,43 @@
 {% block content %}
 <h1>Créanciers</h1>
 <form method="post" action="/creanciers">
-  <input type="text" name="nom" placeholder="Nom" value="{{ prefill.nom if prefill else '' }}" required>
-  <input type="number" step="0.01" name="montant_defaut" placeholder="Montant" value="{{ prefill.montant_defaut if prefill else '' }}" required>
-  <select name="compte_source_id" required>
-    {% for compte in comptes %}
-      <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
-    {% endfor %}
-  </select>
-  <select name="compte_destination_id">
-    <option value="">— externe —</option>
-    {% for compte in comptes %}
-      <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
-    {% endfor %}
-  </select>
-  <input type="date" name="date_prochaine_echeance" required>
-  <select name="recurrence">
-    <option value="mensuelle">Mensuelle</option>
-    <option value="hebdomadaire">Hebdomadaire</option>
-    <option value="custom">Custom</option>
-    <option value="aucune">Aucune (ponctuelle)</option>
-  </select>
-  <input type="number" name="intervalle_jours" placeholder="jours (si custom)">
-  <select name="fin_type">
-    <option value="jamais">Jamais</option>
-    <option value="date">Date de fin</option>
-    <option value="occurrences">Nombre d'occurrences</option>
-  </select>
-  <input type="date" name="fin_date">
-  <input type="number" name="fin_occurrences">
-  <button type="submit">Enregistrer</button>
+  <fieldset role="group">
+    <input type="text" name="nom" placeholder="Nom" value="{{ prefill.nom if prefill else '' }}" required>
+    <input type="number" step="0.01" name="montant_defaut" placeholder="Montant" value="{{ prefill.montant_defaut if prefill else '' }}" required>
+  </fieldset>
+  <fieldset role="group">
+    <select name="compte_source_id" required aria-label="Compte source">
+      {% for compte in comptes %}
+        <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
+      {% endfor %}
+    </select>
+    <select name="compte_destination_id" aria-label="Compte destination">
+      <option value="">— externe —</option>
+      {% for compte in comptes %}
+        <option value="{{ compte.id }}">{{ compte.banque.nom }} / {{ compte.nom }}</option>
+      {% endfor %}
+    </select>
+  </fieldset>
+  <fieldset role="group">
+    <input type="date" name="date_prochaine_echeance" required>
+    <select name="recurrence">
+      <option value="mensuelle">Mensuelle</option>
+      <option value="hebdomadaire">Hebdomadaire</option>
+      <option value="custom">Custom</option>
+      <option value="aucune">Aucune (ponctuelle)</option>
+    </select>
+    <input type="number" name="intervalle_jours" placeholder="jours (si custom)">
+  </fieldset>
+  <fieldset role="group">
+    <select name="fin_type">
+      <option value="jamais">Jamais</option>
+      <option value="date">Date de fin</option>
+      <option value="occurrences">Nombre d'occurrences</option>
+    </select>
+    <input type="date" name="fin_date">
+    <input type="number" name="fin_occurrences" placeholder="Nombre d'occurrences">
+    <button type="submit">Enregistrer</button>
+  </fieldset>
 </form>
 <table>
   <tr><th>Nom</th><th>Montant</th><th>Source</th><th>Destination</th><th>Prochaine échéance</th><th></th></tr>

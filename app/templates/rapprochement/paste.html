@@ -11,16 +11,18 @@
 {% if not mapping %}
 <h3>Calibrage (1re utilisation pour cette banque)</h3>
 <form method="post" action="/rapprochement/{{ banque.id }}/mapping">
-  <label>Colonne date (index depuis 0) <input type="number" name="colonne_date" required></label>
-  <label>Colonne libellé <input type="number" name="colonne_libelle" required></label>
-  <label>Colonne montant <input type="number" name="colonne_montant" required></label>
-  <label>Séparateur
-    <select name="separateur">
-      <option value="tab">Tabulation</option>
-      <option value=";">Point-virgule</option>
-      <option value=",">Virgule</option>
-    </select>
-  </label>
+  <fieldset role="group">
+    <label>Colonne date (index depuis 0)<input type="number" name="colonne_date" required></label>
+    <label>Colonne libellé<input type="number" name="colonne_libelle" required></label>
+    <label>Colonne montant<input type="number" name="colonne_montant" required></label>
+    <label>Séparateur
+      <select name="separateur">
+        <option value="tab">Tabulation</option>
+        <option value=";">Point-virgule</option>
+        <option value=",">Virgule</option>
+      </select>
+    </label>
+  </fieldset>
   <button type="submit">Enregistrer le calibrage</button>
 </form>
 {% else %}

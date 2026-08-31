@@ -2,16 +2,27 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comptes</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    nav.container-fluid { border-bottom: 1px solid var(--pico-muted-border-color); margin-bottom: 2rem; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+  </style>
 </head>
 <body>
-  <nav>
-    <a href="/banques">Banques</a>
-    <a href="/rapprochement">Rapprochement</a>
-    <a href="/reporting/mensuel">Rapport mensuel</a>
-    <a href="/reporting/tags">Dépenses par tag</a>
+  <nav class="container-fluid">
+    <ul><li><strong>Comptes</strong></li></ul>
+    <ul>
+      <li><a href="/banques">Banques</a></li>
+      <li><a href="/rapprochement">Rapprochement</a></li>
+      <li><a href="/reporting/mensuel">Rapport mensuel</a></li>
+      <li><a href="/reporting/tags">Dépenses par tag</a></li>
+    </ul>
   </nav>
-  {% block content %}{% endblock %}
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

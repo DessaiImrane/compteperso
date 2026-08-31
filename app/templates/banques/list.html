@@ -2,12 +2,14 @@
 {% block content %}
 <h1>Banques</h1>
 <form method="post" action="/banques">
-  <input type="text" name="nom" placeholder="Nom de la banque" required>
-  <button type="submit">Ajouter</button>
+  <fieldset role="group">
+    <input type="text" name="nom" placeholder="Nom de la banque" required>
+    <button type="submit">Ajouter</button>
+  </fieldset>
 </form>
-<ul>
+<div class="grid">
   {% for banque in banques %}
-    <li><a href="/banques/{{ banque.id }}">{{ banque.nom }}</a></li>
+    <article><a href="/banques/{{ banque.id }}" role="button" class="outline">{{ banque.nom }}</a></article>
   {% endfor %}
-</ul>
+</div>
 {% endblock %}

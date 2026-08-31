@@ -2,21 +2,23 @@
 {% block content %}
 <h1>Rapport mensuel</h1>
 <form method="get" action="/reporting/mensuel">
-  <select name="compte_virtuel_id">
-    {% for compte in comptes %}
-      <option value="{{ compte.id }}" {% if compte.id == compte_virtuel_id %}selected{% endif %}>{{ compte.nom }}</option>
-    {% endfor %}
-  </select>
-  <input type="number" name="annee" value="{{ annee }}">
-  <input type="number" name="mois" value="{{ mois }}">
-  <button type="submit">Afficher</button>
+  <fieldset role="group">
+    <select name="compte_virtuel_id" aria-label="Compte">
+      {% for compte in comptes %}
+        <option value="{{ compte.id }}" {% if compte.id == compte_virtuel_id %}selected{% endif %}>{{ compte.nom }}</option>
+      {% endfor %}
+    </select>
+    <input type="number" name="annee" value="{{ annee }}" aria-label="Année">
+    <input type="number" name="mois" value="{{ mois }}" aria-label="Mois">
+    <button type="submit">Afficher</button>
+  </fieldset>
 </form>
 {% if rapport %}
-<ul>
-  <li>Récurrent prévu : {{ rapport.recurrent_prevu }}</li>
-  <li>Récurrent pointé : {{ rapport.recurrent_pointe }}</li>
-  <li>Récurrent reste à passer : {{ (rapport.recurrent_prevu - rapport.recurrent_pointe) | round(2) }}</li>
-  <li>Non récurrent pointé : {{ rapport.non_recurrent_pointe }}</li>
-</ul>
+<div class="grid">
+  <article><header>Récurrent prévu</header><strong>{{ rapport.recurrent_prevu }}</strong></article>
+  <article><header>Récurrent pointé</header><strong>{{ rapport.recurrent_pointe }}</strong></article>
+  <article><header>Reste à passer</header><strong>{{ (rapport.recurrent_prevu - rapport.recurrent_pointe) | round(2) }}</strong></article>
+  <article><header>Non récurrent pointé</header><strong>{{ rapport.non_recurrent_pointe }}</strong></article>
+</div>
 {% endif %}
 {% endblock %}

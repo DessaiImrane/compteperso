@@ -2,9 +2,11 @@
 {% block content %}
 <h1>Dépenses par tag</h1>
 <form method="get" action="/reporting/tags">
-  <input type="date" name="date_debut" value="{{ date_debut }}">
-  <input type="date" name="date_fin" value="{{ date_fin }}">
-  <button type="submit">Afficher</button>
+  <fieldset role="group">
+    <input type="date" name="date_debut" value="{{ date_debut }}" aria-label="Date début">
+    <input type="date" name="date_fin" value="{{ date_fin }}" aria-label="Date fin">
+    <button type="submit">Afficher</button>
+  </fieldset>
 </form>
 <ul>
   {% for tag, montant in depenses.items() %}<li>{{ tag }} : {{ montant }}</li>{% endfor %}
