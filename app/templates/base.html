@@ -31,7 +31,11 @@
       border-right: 1px solid var(--sidebar-border); overflow-y: auto;
       height: 100vh; padding: 1.25rem 0.9rem; box-sizing: border-box;
     }
-    .sidebar-title { font-weight: 700; font-size: 1.05rem; margin: 0 0.25rem 1.25rem; color: #0f172a; }
+    .sidebar-title {
+      font-weight: 700; font-size: 1.05rem; margin: 0 0.25rem 1.25rem; color: #0f172a;
+      display: block; text-decoration: none;
+    }
+    .sidebar-title:hover { color: var(--accent); }
     .bank-group { margin-bottom: 1.1rem; }
     .bank-name {
       font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
@@ -72,7 +76,7 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="sidebar-title">Comptes</div>
+      <a class="sidebar-title" href="/banques">Comptes</a>
       {% for entry in sidebar_banques %}
         <div class="bank-group">
           <a class="bank-name" href="/banques/{{ entry.banque.id }}">{{ entry.banque.nom }}</a>
