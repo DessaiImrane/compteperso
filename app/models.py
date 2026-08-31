@@ -81,3 +81,14 @@ class Transaction(Base):
 
     compte_virtuel: Mapped["CompteVirtuel"] = relationship()
     tags: Mapped[list["Tag"]] = relationship(secondary=transaction_tags)
+
+
+class MappingParsing(Base):
+    __tablename__ = "mappings_parsing"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    banque_id: Mapped[int] = mapped_column(ForeignKey("banques.id"), unique=True)
+    colonne_date: Mapped[int]
+    colonne_libelle: Mapped[int]
+    colonne_montant: Mapped[int]
+    separateur: Mapped[str] = mapped_column(default="\t")
