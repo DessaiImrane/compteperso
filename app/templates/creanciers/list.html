@@ -3,6 +3,36 @@
 {% block content %}
 <h1>Créanciers</h1>
 <p><small>Destination externe (vide) : le signe du montant fait foi — négatif = sort du compte, positif = rentre (ex: CAF). Destination interne : la direction est fixée par source→destination, le signe importe peu.</small></p>
+
+<h2>Flux — total des créanciers actifs</h2>
+<div class="grid">
+  <article>
+    <header>Par banque</header>
+    <table class="fixed">
+      <colgroup><col style="width:38%"><col style="width:38%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Source</th><th>Destination</th><th class="num">Total</th></tr></thead>
+      <tbody>
+        {% for f in flux_banque %}
+          <tr><td>{{ f.source }}</td><td>{{ f.destination }}</td><td class="num">{{ f.total|money }}</td></tr>
+        {% endfor %}
+        {% if not flux_banque %}<tr><td colspan="3"><em>Aucun créancier actif.</em></td></tr>{% endif %}
+      </tbody>
+    </table>
+  </article>
+  <article>
+    <header>Par compte virtuel</header>
+    <table class="fixed">
+      <colgroup><col style="width:38%"><col style="width:38%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Source</th><th>Destination</th><th class="num">Total</th></tr></thead>
+      <tbody>
+        {% for f in flux_compte %}
+          <tr><td>{{ f.source }}</td><td>{{ f.destination }}</td><td class="num">{{ f.total|money }}</td></tr>
+        {% endfor %}
+        {% if not flux_compte %}<tr><td colspan="3"><em>Aucun créancier actif.</em></td></tr>{% endif %}
+      </tbody>
+    </table>
+  </article>
+</div>
 <form method="post" action="{{ form_action }}">
   <fieldset role="group">
     <input type="text" name="nom" placeholder="Nom" value="{{ prefill.nom if prefill else '' }}" required>
@@ -42,7 +72,8 @@
     <button type="submit">{{ "Enregistrer" if prefill and "/modifier" in form_action else "Ajouter" }}</button>
   </fieldset>
 </form>
-<table class="fixed">
+<input type="search" class="table-search" placeholder="Rechercher un créancier…" data-filter-table="creanciers-table">
+<table class="fixed sortable" id="creanciers-table">
   <colgroup>
     <col style="width:23%"><col style="width:11%"><col style="width:29%">
     <col style="width:14%"><col style="width:15%"><col style="width:76px">
@@ -54,7 +85,7 @@
     {% for c in creanciers %}
       <tr class="row-clickable" data-href="/creanciers/{{ c.id }}/modifier">
         <td>{{ c.nom }}{% if not c.actif %} <small>(inactif)</small>{% endif %}</td>
-        <td class="num {{ 'amt-pos' if c.montant_defaut >= 0 else 'amt-neg' }}">{{ c.montant_defaut }}</td>
+        <td class="num {{ 'amt-pos' if c.montant_defaut >= 0 else 'amt-neg' }}">{{ c.montant_defaut|money }}</td>
         <td>{{ c.compte_source.nom }} → {{ c.compte_destination.nom if c.compte_destination else "externe" }}</td>
         <td>{{ c.recurrence }}</td>
         <td>{{ c.date_prochaine_echeance or "—" }}</td>

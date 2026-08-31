@@ -15,10 +15,10 @@
 </form>
 {% if rapport %}
 <div class="grid">
-  <article><header>Récurrent prévu</header><strong>{{ rapport.recurrent_prevu }}</strong></article>
-  <article><header>Récurrent pointé</header><strong>{{ rapport.recurrent_pointe }}</strong></article>
-  <article><header>Reste à passer</header><strong>{{ (rapport.recurrent_prevu - rapport.recurrent_pointe) | round(2) }}</strong></article>
-  <article><header>Non récurrent pointé</header><strong>{{ rapport.non_recurrent_pointe }}</strong></article>
+  <article><header>Récurrent prévu</header><strong>{{ rapport.recurrent_prevu|money }}</strong></article>
+  <article><header>Récurrent pointé</header><strong>{{ rapport.recurrent_pointe|money }}</strong></article>
+  <article><header>Reste à passer</header><strong>{{ (rapport.recurrent_prevu - rapport.recurrent_pointe)|money }}</strong></article>
+  <article><header>Non récurrent pointé</header><strong>{{ rapport.non_recurrent_pointe|money }}</strong></article>
 </div>
 {% endif %}
 {% endblock %}

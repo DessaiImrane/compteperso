@@ -9,7 +9,7 @@
   </fieldset>
 </form>
 <ul>
-  {% for tag, montant in depenses.items() %}<li>{{ tag }} : {{ montant }}</li>{% endfor %}
+  {% for tag, montant in depenses.items() %}<li>{{ tag }} : {{ montant|money }}</li>{% endfor %}
 </ul>
 <canvas id="chart-tags" width="400" height="200"></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>

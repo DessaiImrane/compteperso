@@ -51,6 +51,7 @@ app = FastAPI(title="Comptes", lifespan=lifespan)
 templates = Jinja2Templates(
     directory=str(Path(__file__).parent / "templates"), context_processors=[sidebar_context]
 )
+templates.env.filters["money"] = lambda v: f"{v:.2f}"
 
 
 @app.get("/health")

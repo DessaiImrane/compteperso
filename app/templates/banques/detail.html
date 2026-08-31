@@ -3,9 +3,9 @@
 {% block content %}
 <h1>{{ banque.nom }}</h1>
 <p class="num">
-  Pointé <strong class="{{ 'amt-pos' if total_pointe >= 0 else 'amt-neg' }}">{{ total_pointe }}</strong>
-  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if total_a_venir >= 0 else 'amt-neg' }}">{{ total_a_venir }}</strong>
-  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if total_solde >= 0 else 'amt-neg' }}">{{ total_solde }}</strong>
+  Pointé <strong class="{{ 'amt-pos' if total_pointe >= 0 else 'amt-neg' }}">{{ total_pointe|money }}</strong>
+  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if total_a_venir >= 0 else 'amt-neg' }}">{{ total_a_venir|money }}</strong>
+  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if total_solde >= 0 else 'amt-neg' }}">{{ total_solde|money }}</strong>
 </p>
 <form method="post" action="/banques/{{ banque.id }}/comptes">
   <fieldset role="group">
@@ -13,7 +13,8 @@
     <button type="submit">Ajouter</button>
   </fieldset>
 </form>
-<table class="fixed">
+<input type="search" class="table-search" placeholder="Rechercher un compte…" data-filter-table="comptes-table">
+<table class="fixed sortable" id="comptes-table">
   <colgroup><col style="width:46%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:48px"></colgroup>
   <thead>
     <tr><th>Compte</th><th class="num">Pointé</th><th class="num">À venir</th><th class="num">Solde</th><th></th></tr>
@@ -22,9 +23,9 @@
     {% for c in comptes %}
       <tr>
         <td><a href="/comptes/{{ c.compte.id }}/transactions">{{ c.compte.nom }}</a>{% if not c.compte.actif %} (archivé){% endif %}</td>
-        <td class="num {{ 'amt-pos' if c.pointe >= 0 else 'amt-neg' }}">{{ c.pointe }}</td>
-        <td class="num {{ 'amt-pos' if c.a_venir >= 0 else 'amt-neg' }}">{{ c.a_venir }}</td>
-        <td class="num {{ 'amt-pos' if c.solde >= 0 else 'amt-neg' }}">{{ c.solde }}</td>
+        <td class="num {{ 'amt-pos' if c.pointe >= 0 else 'amt-neg' }}">{{ c.pointe|money }}</td>
+        <td class="num {{ 'amt-pos' if c.a_venir >= 0 else 'amt-neg' }}">{{ c.a_venir|money }}</td>
+        <td class="num {{ 'amt-pos' if c.solde >= 0 else 'amt-neg' }}">{{ c.solde|money }}</td>
         <td>
           {% if c.compte.actif %}
           <form method="post" action="/comptes/{{ c.compte.id }}/archiver">

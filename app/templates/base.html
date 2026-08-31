@@ -86,6 +86,10 @@
 
     article { border-radius: var(--pico-border-radius); box-shadow: 0 1px 3px rgba(15, 23, 42, .08); margin-bottom: 1.25rem; }
     button, input[type="submit"], [role="button"] { border-radius: 8px; }
+
+    input.table-search { max-width: 320px; margin-bottom: 0.75rem; }
+    table.fixed.sortable thead th { cursor: pointer; user-select: none; }
+    table.fixed.sortable thead th:hover { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -132,6 +136,59 @@
             body: JSON.stringify({ ordre: ids }),
           });
         },
+      });
+    });
+
+    // Sidebar keeps its scroll position across full page navigations, so it
+    // reads as "only the middle screen changed" even without an SPA.
+    (function () {
+      var sidebar = document.querySelector('.sidebar');
+      var KEY = 'sidebar-scroll';
+      var saved = sessionStorage.getItem(KEY);
+      if (saved !== null) sidebar.scrollTop = parseInt(saved, 10);
+      sidebar.addEventListener('scroll', function () {
+        sessionStorage.setItem(KEY, sidebar.scrollTop);
+      });
+    })();
+
+    // Generic click-to-sort + live search for any table.fixed with an id,
+    // paired with an <input data-filter-table="that-id">. Pure JS, no lib.
+    document.querySelectorAll('table.fixed.sortable').forEach(function (table) {
+      table.querySelectorAll('thead th').forEach(function (th, colIndex) {
+        if (!th.textContent.trim()) return;
+        var asc = true;
+        th.addEventListener('click', function () {
+          var tbody = table.querySelector('tbody');
+          var rows = Array.from(tbody.querySelectorAll('tr'));
+          rows.sort(function (a, b) {
+            var av = (a.children[colIndex] || {}).textContent || '';
+            var bv = (b.children[colIndex] || {}).textContent || '';
+            av = av.trim();
+            bv = bv.trim();
+            var an = parseFloat(av.replace(',', '.'));
+            var bn = parseFloat(bv.replace(',', '.'));
+            var cmp;
+            if (!isNaN(an) && !isNaN(bn) && av !== '' && bv !== '') {
+              cmp = an - bn;
+            } else {
+              cmp = av.localeCompare(bv, 'fr');
+            }
+            return asc ? cmp : -cmp;
+          });
+          rows.forEach(function (r) { tbody.appendChild(r); });
+          asc = !asc;
+        });
+      });
+    });
+
+    document.querySelectorAll('input[data-filter-table]').forEach(function (input) {
+      var table = document.getElementById(input.dataset.filterTable);
+      if (!table) return;
+      input.addEventListener('input', function () {
+        var q = input.value.trim().toLowerCase();
+        table.querySelectorAll('tbody tr').forEach(function (tr) {
+          tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
       });
     });
   </script>

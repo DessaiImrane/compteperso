@@ -3,9 +3,9 @@
 {% block content %}
 <h1>{{ compte.nom }} — transactions</h1>
 <p class="num">
-  Pointé <strong class="{{ 'amt-pos' if pointe >= 0 else 'amt-neg' }}">{{ pointe }}</strong>
-  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if a_venir >= 0 else 'amt-neg' }}">{{ a_venir }}</strong>
-  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if solde >= 0 else 'amt-neg' }}">{{ solde }}</strong>
+  Pointé <strong class="{{ 'amt-pos' if pointe >= 0 else 'amt-neg' }}">{{ pointe|money }}</strong>
+  &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if a_venir >= 0 else 'amt-neg' }}">{{ a_venir|money }}</strong>
+  &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if solde >= 0 else 'amt-neg' }}">{{ solde|money }}</strong>
 </p>
 <form method="post" action="{{ form_action }}">
   <fieldset role="group">
@@ -16,7 +16,8 @@
     <button type="submit">{{ "Enregistrer" if prefill and "/modifier" in form_action else "Ajouter" }}</button>
   </fieldset>
 </form>
-<table class="fixed">
+<input type="search" class="table-search" placeholder="Rechercher une transaction…" data-filter-table="transactions-table">
+<table class="fixed sortable" id="transactions-table">
   <colgroup>
     <col style="width:10%"><col style="width:30%"><col style="width:14%">
     <col style="width:22%"><col style="width:12%"><col style="width:48px">
@@ -29,7 +30,7 @@
     <tr class="row-clickable" data-href="/transactions/{{ tx.id }}/modifier">
       <td>{{ tx.date }}</td>
       <td>{{ tx.libelle }}</td>
-      <td class="num {{ 'amt-pos' if tx.montant >= 0 else 'amt-neg' }}">{{ tx.montant }}</td>
+      <td class="num {{ 'amt-pos' if tx.montant >= 0 else 'amt-neg' }}">{{ tx.montant|money }}</td>
       <td>{{ tx.tags | map(attribute="nom") | join(", ") }}</td>
       <td>
         <form method="post" action="/transactions/{{ tx.id }}/pointer">

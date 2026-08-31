@@ -26,6 +26,25 @@ def test_create_creancier(client):
     assert "Loyer" in resp.text
 
 
+def test_creanciers_page_shows_flux_totals(client):
+    compte = _compte(client, nom="Hello")
+    dest = _compte(client, nom="LaPoste")
+    client.post(
+        "/creanciers",
+        data={
+            "nom": "Virement", "montant_defaut": "250", "compte_source_id": str(compte.id),
+            "compte_destination_id": str(dest.id), "date_prochaine_echeance": "2026-09-01",
+            "recurrence": "mensuelle", "fin_type": "jamais",
+        },
+    )
+
+    resp = client.get("/creanciers")
+
+    assert "Flux" in resp.text
+    assert "Hello" in resp.text and "LaPoste" in resp.text
+    assert "250.00" in resp.text
+
+
 def test_duplicate_creancier_prefills_form(client):
     compte = _compte(client)
     client.post(

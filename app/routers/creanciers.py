@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.main import templates
 from app.models import CompteVirtuel, Creancier
+from app.services.reporting import flux_creanciers_par_banque, flux_creanciers_par_compte
 
 router = APIRouter()
 
@@ -39,6 +40,8 @@ def _render(request, db: Session, prefill, form_action: str):
             "comptes": comptes,
             "prefill": prefill,
             "form_action": form_action,
+            "flux_banque": flux_creanciers_par_banque(db),
+            "flux_compte": flux_creanciers_par_compte(db),
         },
     )
 

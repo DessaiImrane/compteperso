@@ -13,9 +13,9 @@
   <header style="display:flex; justify-content:space-between; align-items:center;">
     <a href="/banques/{{ row.banque.id }}"><strong>{{ row.banque.nom }}</strong></a>
     <span class="num">
-      Pointé <strong class="{{ 'amt-pos' if row.pointe >= 0 else 'amt-neg' }}">{{ row.pointe }}</strong>
-      &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if row.a_venir >= 0 else 'amt-neg' }}">{{ row.a_venir }}</strong>
-      &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if row.solde >= 0 else 'amt-neg' }}">{{ row.solde }}</strong>
+      Pointé <strong class="{{ 'amt-pos' if row.pointe >= 0 else 'amt-neg' }}">{{ row.pointe|money }}</strong>
+      &nbsp;·&nbsp; À venir <strong class="{{ 'amt-pos' if row.a_venir >= 0 else 'amt-neg' }}">{{ row.a_venir|money }}</strong>
+      &nbsp;·&nbsp; Solde <strong class="{{ 'amt-pos' if row.solde >= 0 else 'amt-neg' }}">{{ row.solde|money }}</strong>
     </span>
   </header>
   <table class="fixed">
@@ -27,9 +27,9 @@
       {% for c in row.comptes %}
         <tr>
           <td><a href="/comptes/{{ c.compte.id }}/transactions">{{ c.compte.nom }}</a></td>
-          <td class="num {{ 'amt-pos' if c.pointe >= 0 else 'amt-neg' }}">{{ c.pointe }}</td>
-          <td class="num {{ 'amt-pos' if c.a_venir >= 0 else 'amt-neg' }}">{{ c.a_venir }}</td>
-          <td class="num {{ 'amt-pos' if c.solde >= 0 else 'amt-neg' }}">{{ c.solde }}</td>
+          <td class="num {{ 'amt-pos' if c.pointe >= 0 else 'amt-neg' }}">{{ c.pointe|money }}</td>
+          <td class="num {{ 'amt-pos' if c.a_venir >= 0 else 'amt-neg' }}">{{ c.a_venir|money }}</td>
+          <td class="num {{ 'amt-pos' if c.solde >= 0 else 'amt-neg' }}">{{ c.solde|money }}</td>
         </tr>
       {% endfor %}
       {% if not row.comptes %}
