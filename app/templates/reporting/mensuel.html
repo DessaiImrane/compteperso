@@ -15,6 +15,7 @@
 </form>
 {% if rapport %}
 <div class="grid">
+  <article><header>Reliquat début de mois</header><strong class="{{ 'amt-pos' if rapport.reliquat_debut_mois >= 0 else 'amt-neg' }}">{{ rapport.reliquat_debut_mois|money }}</strong></article>
   <article><header>Récurrent prévu</header><strong>{{ rapport.recurrent_prevu|money }}</strong></article>
   <article><header>Récurrent pointé</header><strong>{{ rapport.recurrent_pointe|money }}</strong></article>
   <article><header>Reste à passer</header><strong>{{ (rapport.recurrent_prevu - rapport.recurrent_pointe)|money }}</strong></article>

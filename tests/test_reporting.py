@@ -41,10 +41,32 @@ def test_rapport_mensuel_splits_recurrent_and_non_recurrent(db_session):
     rapport = rapport_mensuel(db_session, compte.id, 2026, 9)
 
     assert rapport == {
+        "reliquat_debut_mois": -10.0,
         "recurrent_prevu": 800.0,
         "recurrent_pointe": 800.0,
         "non_recurrent_pointe": 60.0,
     }
+
+
+def test_rapport_mensuel_reliquat_sums_all_prior_transactions(db_session):
+    compte = _compte(db_session)
+    db_session.add_all(
+        [
+            Transaction(date=dt.date(2026, 7, 15), compte_virtuel=compte, montant=1500.0,
+                        libelle="Salaire", pointe=True),
+            Transaction(date=dt.date(2026, 8, 20), compte_virtuel=compte, montant=-1450.0,
+                        libelle="Depenses aout", pointe=True),
+            Transaction(date=dt.date(2026, 8, 25), compte_virtuel=compte, montant=-30.0,
+                        libelle="Pas encore passe", pointe=False),
+            Transaction(date=dt.date(2026, 9, 5), compte_virtuel=compte, montant=-20.0,
+                        libelle="Deja en septembre", pointe=True),
+        ]
+    )
+    db_session.commit()
+
+    rapport = rapport_mensuel(db_session, compte.id, 2026, 9)
+
+    assert rapport["reliquat_debut_mois"] == 20.0  # 1500 - 1450 - 30
 
 
 def test_depenses_par_tag_aggregates_negative_amounts(db_session):

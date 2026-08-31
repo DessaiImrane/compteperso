@@ -8,6 +8,14 @@ from app.models import Creancier, Transaction
 def rapport_mensuel(db, compte_virtuel_id: int, annee: int, mois: int) -> dict:
     start = datetime.date(annee, mois, 1)
     end = datetime.date(annee, mois, calendar.monthrange(annee, mois)[1])
+
+    reliquat_rows = (
+        db.query(Transaction.montant)
+        .filter(Transaction.compte_virtuel_id == compte_virtuel_id, Transaction.date < start)
+        .all()
+    )
+    reliquat_debut_mois = round(sum(r[0] for r in reliquat_rows), 2)
+
     txs = (
         db.query(Transaction)
         .filter(
@@ -20,6 +28,7 @@ def rapport_mensuel(db, compte_virtuel_id: int, annee: int, mois: int) -> dict:
     recurrent = [t for t in txs if t.creancier_id is not None]
     non_recurrent = [t for t in txs if t.creancier_id is None]
     return {
+        "reliquat_debut_mois": reliquat_debut_mois,
         "recurrent_prevu": round(sum(abs(t.montant) for t in recurrent), 2),
         "recurrent_pointe": round(sum(abs(t.montant) for t in recurrent if t.pointe), 2),
         "non_recurrent_pointe": round(
