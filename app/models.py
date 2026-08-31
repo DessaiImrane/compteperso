@@ -31,6 +31,7 @@ class CompteVirtuel(Base):
     banque_id: Mapped[int] = mapped_column(ForeignKey("banques.id"))
     nom: Mapped[str]
     actif: Mapped[bool] = mapped_column(default=True)
+    ordre: Mapped[int] = mapped_column(default=0)
 
     banque: Mapped["Banque"] = relationship(back_populates="comptes")
 

@@ -8,8 +8,19 @@
   </fieldset>
 </form>
 <div class="grid">
-  {% for banque in banques %}
-    <article><a href="/banques/{{ banque.id }}" role="button" class="outline">{{ banque.nom }}</a></article>
+  {% for banque, comptes, total_banque in rows %}
+    <article>
+      <header>
+        <a href="/banques/{{ banque.id }}">{{ banque.nom }}</a>
+        <small> — total pointé {{ total_banque }}</small>
+      </header>
+      <ul>
+        {% for compte, pointe, a_venir in comptes %}
+          <li><a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a> — pointé {{ pointe }}, à venir {{ a_venir }}</li>
+        {% endfor %}
+        {% if not comptes %}<li><em>Aucun compte virtuel — <a href="/banques/{{ banque.id }}">en ajouter un</a></em></li>{% endif %}
+      </ul>
+    </article>
   {% endfor %}
 </div>
 {% endblock %}

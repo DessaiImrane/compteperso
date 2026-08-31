@@ -6,14 +6,13 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from app.db import Base, SessionLocal, engine
+from app.db import Base, SessionLocal, engine, get_db
+from app.models import Banque, CompteVirtuel
 from app.services.creancier_engine import generate_due_echeances
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    import app.models  # noqa: F401  ensure all tables are registered on Base.metadata
-
     Base.metadata.create_all(engine)
     db = SessionLocal()
     try:
@@ -23,8 +22,34 @@ async def lifespan(app: FastAPI):
     yield
 
 
+def sidebar_context(request):
+    # Reuse whatever get_db override is active (e.g. the test client's in-memory
+    # session) instead of always hitting the real engine, mirroring FastAPI's
+    # own Depends(get_db) resolution.
+    override = app.dependency_overrides.get(get_db, get_db)
+    gen = override()
+    db = next(gen)
+    try:
+        banques = db.query(Banque).order_by(Banque.nom).all()
+        sidebar_banques = [
+            {
+                "banque": banque,
+                "comptes": db.query(CompteVirtuel)
+                .filter_by(banque_id=banque.id, actif=True)
+                .order_by(CompteVirtuel.ordre)
+                .all(),
+            }
+            for banque in banques
+        ]
+    finally:
+        gen.close()
+    return {"sidebar_banques": sidebar_banques}
+
+
 app = FastAPI(title="Comptes", lifespan=lifespan)
-templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+templates = Jinja2Templates(
+    directory=str(Path(__file__).parent / "templates"), context_processors=[sidebar_context]
+)
 
 
 @app.get("/health")

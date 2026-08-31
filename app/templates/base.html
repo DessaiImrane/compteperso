@@ -6,24 +6,62 @@
   <title>Comptes</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
   <style>
-    nav.container-fluid { border-bottom: 1px solid var(--pico-muted-border-color); margin-bottom: 2rem; }
+    .layout { display: flex; align-items: flex-start; }
+    .sidebar {
+      width: 260px; flex-shrink: 0; padding: 1rem; border-right: 1px solid var(--pico-muted-border-color);
+      min-height: 100vh; position: sticky; top: 0;
+    }
+    .sidebar h2 { font-size: 0.9rem; text-transform: uppercase; color: var(--pico-muted-color); margin-bottom: 0.5rem; }
+    .sidebar ul { list-style: none; padding-left: 0; margin: 0 0 1rem 0; }
+    .sidebar .comptes { padding-left: 0.75rem; margin-bottom: 1rem; }
+    .sidebar .comptes li { cursor: grab; padding: 0.15rem 0; }
+    .sidebar nav ul { margin-bottom: 0; }
+    main.container { flex: 1; padding: 1.5rem 2rem; }
     table { display: block; overflow-x: auto; white-space: nowrap; }
   </style>
 </head>
 <body>
-  <nav class="container-fluid">
-    <ul><li><strong>Comptes</strong></li></ul>
-    <ul>
-      <li><a href="/banques">Banques</a></li>
-      <li><a href="/rapprochement">Rapprochement</a></li>
-      <li><a href="/reporting/mensuel">Rapport mensuel</a></li>
-      <li><a href="/reporting/tags">Dépenses par tag</a></li>
-      <li><a href="/reglages">Réglages</a></li>
-    </ul>
-  </nav>
-  <main class="container">
-    {% block content %}{% endblock %}
-  </main>
+  <div class="layout">
+    <aside class="sidebar">
+      <strong>Comptes</strong>
+      {% for entry in sidebar_banques %}
+        <h2><a href="/banques/{{ entry.banque.id }}">{{ entry.banque.nom }}</a></h2>
+        <ul class="comptes" data-banque-id="{{ entry.banque.id }}">
+          {% for compte in entry.comptes %}
+            <li data-id="{{ compte.id }}">⠿ <a href="/comptes/{{ compte.id }}/transactions">{{ compte.nom }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+      <nav>
+        <ul>
+          <li><a href="/rapprochement">Rapprochement</a></li>
+          <li><a href="/creanciers">Créanciers</a></li>
+          <li><a href="/reporting/mensuel">Rapport mensuel</a></li>
+          <li><a href="/reporting/tags">Dépenses par tag</a></li>
+          <li><a href="/reglages">Réglages</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script>
+    document.querySelectorAll('.sidebar .comptes').forEach(function (list) {
+      new Sortable(list, {
+        animation: 150,
+        onEnd: function () {
+          const ids = Array.from(list.children).map(function (li) { return parseInt(li.dataset.id, 10); });
+          fetch('/banques/' + list.dataset.banqueId + '/comptes/ordre', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ordre: ids }),
+          });
+        },
+      });
+    });
+  </script>
 </body>
 </html>
