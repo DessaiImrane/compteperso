@@ -72,16 +72,19 @@ def generate_due_echeances(db: Session, today: datetime.date) -> list[Transactio
                 db.add_all([debit, credit])
                 created.extend([debit, credit])
             else:
-                debit = Transaction(
+                # Externe: pas de compte destination pour fixer la direction, donc
+                # le signe saisi sur le créancier fait foi (négatif = sort vers
+                # l'externe, positif = rentre depuis l'externe, ex: CAF).
+                mouvement = Transaction(
                     date=echeance_date,
                     compte_virtuel_id=creancier.compte_source_id,
-                    montant=-abs(creancier.montant_defaut),
+                    montant=creancier.montant_defaut,
                     libelle=creancier.nom,
                     pointe=False,
                     creancier_id=creancier.id,
                 )
-                db.add(debit)
-                created.append(debit)
+                db.add(mouvement)
+                created.append(mouvement)
 
             creancier.occurrences_generees += 1
 

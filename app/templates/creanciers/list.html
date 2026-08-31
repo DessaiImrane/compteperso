@@ -2,6 +2,7 @@
 {% from "_icons.html" import duplicate_icon %}
 {% block content %}
 <h1>Créanciers</h1>
+<p><small>Destination externe (vide) : le signe du montant fait foi — négatif = sort du compte, positif = rentre (ex: CAF). Destination interne : la direction est fixée par source→destination, le signe importe peu.</small></p>
 <form method="post" action="/creanciers">
   <fieldset role="group">
     <input type="text" name="nom" placeholder="Nom" value="{{ prefill.nom if prefill else '' }}" required>

@@ -64,11 +64,11 @@ def test_generate_interne_creates_two_linked_transactions(db_session):
     assert creancier.occurrences_generees == 1
 
 
-def test_generate_externe_creates_one_transaction(db_session):
+def test_generate_externe_sortie_respecte_le_signe_negatif(db_session):
     hello, poste = _make_comptes(db_session)
     creancier = Creancier(
         nom="Prélèvement loyer",
-        montant_defaut=800.0,
+        montant_defaut=-800.0,
         compte_source=poste,
         compte_destination=None,
         date_prochaine_echeance=dt.date(2026, 9, 5),
@@ -83,6 +83,26 @@ def test_generate_externe_creates_one_transaction(db_session):
     assert len(created) == 1
     assert created[0].montant == -800.0
     assert created[0].transfer_link_id is None
+
+
+def test_generate_externe_entree_respecte_le_signe_positif(db_session):
+    hello, poste = _make_comptes(db_session)
+    creancier = Creancier(
+        nom="CAF",
+        montant_defaut=250.0,
+        compte_source=poste,
+        compte_destination=None,
+        date_prochaine_echeance=dt.date(2026, 9, 5),
+        recurrence="mensuelle",
+        fin_type="jamais",
+    )
+    db_session.add(creancier)
+    db_session.commit()
+
+    created = generate_due_echeances(db_session, dt.date(2026, 9, 5))
+
+    assert len(created) == 1
+    assert created[0].montant == 250.0
 
 
 def test_generate_catches_up_multiple_missed_months(db_session):
