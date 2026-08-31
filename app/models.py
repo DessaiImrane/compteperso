@@ -92,3 +92,13 @@ class MappingParsing(Base):
     colonne_libelle: Mapped[int]
     colonne_montant: Mapped[int]
     separateur: Mapped[str] = mapped_column(default="\t")
+
+
+class TagLearning(Base):
+    __tablename__ = "tag_learning"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    libelle_pattern: Mapped[str]
+    tag_id: Mapped[int] = mapped_column(ForeignKey("tags.id"))
+
+    tag: Mapped["Tag"] = relationship()
