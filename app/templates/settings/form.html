@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Réglages</h1>
+<form method="post" action="/reglages">
+  <label>Dossier de backup (copié à la fermeture de l'app)
+    <input type="text" name="backup_dir" value="{{ backup_dir }}" required>
+  </label>
+  <button type="submit">Enregistrer</button>
+</form>
+{% if saved %}<p><ins>Enregistré.</ins></p>{% endif %}
+{% endblock %}

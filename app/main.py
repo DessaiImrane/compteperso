@@ -37,10 +37,11 @@ def root():
     return RedirectResponse("/banques")
 
 
-from app.routers import banques, creanciers, rapprochement, reporting, transactions  # noqa: E402
+from app.routers import banques, creanciers, rapprochement, reporting, settings, transactions  # noqa: E402
 
 app.include_router(banques.router)
 app.include_router(transactions.router)
 app.include_router(creanciers.router)
 app.include_router(rapprochement.router)
 app.include_router(reporting.router)
+app.include_router(settings.router)

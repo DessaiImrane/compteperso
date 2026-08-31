@@ -114,3 +114,10 @@ class RapprochementSession(Base):
     total_banque_a_venir: Mapped[float]
     total_pointe_calcule: Mapped[float]
     ecart: Mapped[float]
+
+
+class Settings(Base):
+    __tablename__ = "settings"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    backup_dir: Mapped[str]

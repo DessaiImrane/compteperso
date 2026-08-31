@@ -1,17 +1,15 @@
 import datetime
 import threading
 import time
-from pathlib import Path
 
 import uvicorn
 import webview
 
-from app.db import get_db_path
+from app.db import SessionLocal, get_db_path
 from app.main import app
-from app.services.backup import backup_database
+from app.services.backup import backup_database, get_backup_dir
 
 PORT = 8731
-BACKUP_DIR_ENV_DEFAULT = Path.home() / "Google Drive" / "ComptesAppBackups"
 
 
 def _run_server(server: uvicorn.Server) -> None:
@@ -33,8 +31,14 @@ def main() -> None:
     server.should_exit = True
     thread.join(timeout=5)
 
+    db = SessionLocal()
+    try:
+        backup_dir = get_backup_dir(db)
+    finally:
+        db.close()
+
     timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    backup_database(get_db_path(), BACKUP_DIR_ENV_DEFAULT, timestamp)
+    backup_database(get_db_path(), backup_dir, timestamp)
 
 
 if __name__ == "__main__":
