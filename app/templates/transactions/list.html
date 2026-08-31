@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ compte.nom }} — transactions</h1>
+<form method="post" action="/comptes/{{ compte.id }}/transactions">
+  <input type="date" name="date" value="{{ prefill.date if prefill else '' }}" required>
+  <input type="text" name="libelle" placeholder="Libellé" value="{{ prefill.libelle if prefill else '' }}" required>
+  <input type="number" step="0.01" name="montant" placeholder="Montant" value="{{ prefill.montant if prefill else '' }}" required>
+  <input type="text" name="tags" placeholder="tags séparés par virgule" value="{{ prefill.tags if prefill else '' }}">
+  <button type="submit">Ajouter</button>
+</form>
+<table>
+  <tr><th>Date</th><th>Libellé</th><th>Montant</th><th>Tags</th><th>Pointé</th><th></th></tr>
+  {% for tx in transactions %}
+    <tr>
+      <td>{{ tx.date }}</td>
+      <td>{{ tx.libelle }}</td>
+      <td>{{ tx.montant }}</td>
+      <td>{{ tx.tags | map(attribute="nom") | join(", ") }}</td>
+      <td>
+        {% if not tx.pointe %}
+        <form method="post" action="/transactions/{{ tx.id }}/pointer">
+          <button type="submit">Pointer</button>
+        </form>
+        {% else %}Oui{% endif %}
+      </td>
+      <td><a href="/transactions/{{ tx.id }}/dupliquer">Dupliquer</a></td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

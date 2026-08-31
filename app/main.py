@@ -12,6 +12,7 @@ def health():
     return {"status": "ok"}
 
 
-from app.routers import banques  # noqa: E402
+from app.routers import banques, transactions  # noqa: E402
 
 app.include_router(banques.router)
+app.include_router(transactions.router)
