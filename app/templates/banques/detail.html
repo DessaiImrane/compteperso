@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_icons.html" import archive_icon %}
 {% block content %}
 <h1>{{ banque.nom }}</h1>
 <p class="num">
@@ -27,7 +28,7 @@
         <td>
           {% if c.compte.actif %}
           <form method="post" action="/comptes/{{ c.compte.id }}/archiver">
-            <button type="submit">Archiver</button>
+            <button type="submit" class="icon-link" style="background:none; border:none; padding:0;" title="Archiver">{{ archive_icon() }}</button>
           </form>
           {% endif %}
         </td>
