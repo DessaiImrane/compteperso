@@ -1,5 +1,10 @@
 .venv/
 *.db
+*.db-journal
 __pycache__/
 *.pyc
 *.egg-info/
+scripts/ComptesApp.app/
+.DS_Store
+.vscode/
+.idea/

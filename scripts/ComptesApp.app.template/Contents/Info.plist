@@ -7,7 +7,7 @@
   <key>CFBundleDisplayName</key>
   <string>Comptes</string>
   <key>CFBundleIdentifier</key>
-  <string>fr.imrane.comptesapp</string>
+  <string>com.example.compteperso</string>
   <key>CFBundleVersion</key>
   <string>1.0</string>
   <key>CFBundleExecutable</key>
