@@ -122,3 +122,4 @@ class Settings(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     backup_dir: Mapped[str]
+    derniere_ouverture: Mapped[datetime.datetime | None] = mapped_column(nullable=True)

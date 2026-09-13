@@ -1,3 +1,4 @@
+import datetime
 import shutil
 from pathlib import Path
 
@@ -27,3 +28,18 @@ def set_backup_dir(db, backup_dir: str) -> None:
     else:
         db.add(Settings(backup_dir=backup_dir))
     db.commit()
+
+
+def bump_derniere_ouverture(db, now: datetime.datetime) -> datetime.datetime | None:
+    """Record `now` as the last-opened time and return whatever was recorded
+    before this call, i.e. the previous time the app was opened — that's the
+    value worth showing the user (when to copy bank statements from)."""
+    settings = db.query(Settings).first()
+    if settings:
+        previous = settings.derniere_ouverture
+        settings.derniere_ouverture = now
+    else:
+        previous = None
+        db.add(Settings(backup_dir=str(DEFAULT_BACKUP_DIR), derniere_ouverture=now))
+    db.commit()
+    return previous

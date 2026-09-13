@@ -8,16 +8,21 @@ from fastapi.templating import Jinja2Templates
 
 from app.db import Base, SessionLocal, ensure_columns, engine, get_db
 from app.models import Banque, CompteVirtuel
+from app.services.backup import bump_derniere_ouverture
 from app.services.creancier_engine import generate_due_echeances
+
+derniere_ouverture_precedente: datetime.datetime | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global derniere_ouverture_precedente
     Base.metadata.create_all(engine)
     ensure_columns(engine, Base.metadata)
     db = SessionLocal()
     try:
         generate_due_echeances(db, datetime.date.today())
+        derniere_ouverture_precedente = bump_derniere_ouverture(db, datetime.datetime.now())
     finally:
         db.close()
     yield
@@ -44,7 +49,10 @@ def sidebar_context(request):
         ]
     finally:
         gen.close()
-    return {"sidebar_banques": sidebar_banques}
+    return {
+        "sidebar_banques": sidebar_banques,
+        "derniere_ouverture_precedente": derniere_ouverture_precedente,
+    }
 
 
 app = FastAPI(title="Comptes", lifespan=lifespan)

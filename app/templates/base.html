@@ -24,12 +24,20 @@
     html, body { height: 100%; margin: 0; }
     body { background: #f1f5f9; }
 
-    .app-shell { display: flex; height: 100vh; overflow: hidden; }
+    .page { display: flex; flex-direction: column; height: 100vh; }
+
+    .top-banner {
+      flex-shrink: 0; background: var(--accent); color: #fff;
+      padding: 0.6rem 1.5rem; font-size: 1.05rem; text-align: center;
+    }
+    .top-banner strong { font-size: 1.15rem; }
+
+    .app-shell { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 
     .sidebar {
       width: 260px; flex-shrink: 0; background: var(--sidebar-bg);
       border-right: 1px solid var(--sidebar-border); overflow-y: auto;
-      height: 100vh; padding: 1.25rem 0.9rem; box-sizing: border-box;
+      height: 100%; padding: 1.25rem 0.9rem; box-sizing: border-box;
     }
     .sidebar-title {
       font-weight: 700; font-size: 1.05rem; margin: 0 0.25rem 1.25rem; color: #0f172a;
@@ -58,7 +66,7 @@
     }
     .sidebar-nav a:hover { background: var(--row-hover); color: var(--accent); }
 
-    main.main-scroll { flex: 1; overflow-y: auto; height: 100vh; padding: 2rem 2.5rem; box-sizing: border-box; }
+    main.main-scroll { flex: 1; overflow-y: auto; height: 100%; padding: 2rem 2.5rem; box-sizing: border-box; }
     main.main-scroll > :first-child { margin-top: 0; }
 
     table { border-collapse: collapse; overflow-x: auto; display: block; white-space: nowrap; }
@@ -98,7 +106,12 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="page">
+    <header class="top-banner">
+      Dernière ouverture :
+      <strong>{{ derniere_ouverture_precedente.strftime("%d/%m/%Y à %H:%M") if derniere_ouverture_precedente else "jamais (première ouverture)" }}</strong>
+    </header>
+    <div class="app-shell">
     <aside class="sidebar">
       <a class="sidebar-title" href="/banques">Comptes</a>
       {% for entry in sidebar_banques %}
@@ -127,6 +140,7 @@
     <main class="main-scroll">
       {% block content %}{% endblock %}
     </main>
+    </div>
   </div>
   <script>
     document.querySelectorAll('.compte-list').forEach(function (list) {
